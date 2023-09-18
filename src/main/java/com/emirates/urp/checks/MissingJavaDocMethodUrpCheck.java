@@ -222,14 +222,13 @@ public class MissingJavaDocMethodUrpCheck extends AbstractCheck {
     //This condition will only be true if both conditions are true:
     // the file is present in the modified fileset and
     // the filename does not match the given regular expression.
-    if (changedFileSet.contains(filename) && !result) {
-      if (shouldCheck(ast)) {
+    if (changedFileSet.contains(filename) && !result && (shouldCheck(ast))) {
         final FileContents contents = getFileContents();
         final TextBlock textBlock = contents.getJavadocBefore(ast.getLineNo());
         if (textBlock == null && !isMissingJavadocAllowed(ast)) {
           this.log(ast, MSG_JAVADOC_MISSING);
         }
-      }
+
     }
   }
 
