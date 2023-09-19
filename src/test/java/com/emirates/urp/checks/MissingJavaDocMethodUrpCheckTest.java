@@ -33,4 +33,18 @@ class MissingJavaDocMethodUrpCheckTest {
     checkstyle.check("MissingJavadocMethodUrpCheck/SubMethodsTestClass.java");
     checkstyle.assertViolationCount(4);
   }
+
+
+  @Test
+  void shouldReportViolationsWhenWeHaveRecordClass() {
+    TestCheckstyle checkstyle = new TestCheckstyle(MissingJavaDocMethodUrpCheck.class, c -> {
+      c.addProperty("fileExtensions", "java");
+      c.addProperty("changedFileSet", "RecordTestClass.java");
+      c.addProperty("enabledGit", "false");
+      c.addProperty("minLineCount", "0");
+    });
+
+    checkstyle.check("MissingJavadocMethodUrpCheck/RecordTestClass.java");
+    checkstyle.assertViolationCount(1);
+  }
 }

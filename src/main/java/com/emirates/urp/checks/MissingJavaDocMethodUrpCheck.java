@@ -1,5 +1,6 @@
 package com.emirates.urp.checks;
 
+import static com.emirates.urp.checks.common.CheckUtil.getSurroundingAccessModifier;
 import static com.emirates.urp.checks.common.DetailASTUtil.getRootClassName;
 import static java.util.stream.Collectors.toSet;
 
@@ -175,7 +176,6 @@ public class MissingJavaDocMethodUrpCheck extends AbstractCheck {
         .filter(it -> enabledGit)
         .map(CheckCodeStyleUtils::getChangedFileList)
         .orElse(changedFileSet);
-    //log.info("You don't have changed files.");
   }
 
 
@@ -210,7 +210,6 @@ public class MissingJavaDocMethodUrpCheck extends AbstractCheck {
   @SuppressWarnings("deprecation")
   @Override
   public final void visitToken(DetailAST ast) {
-
     final Path path = Paths.get(getFilePath());
     final String filename = path.getFileName().getFileName().toString();
     final var rootClassName = getRootClassName(ast);
@@ -288,8 +287,8 @@ public class MissingJavaDocMethodUrpCheck extends AbstractCheck {
    * @return whether we should check a given node.
    */
   private boolean shouldCheck(final DetailAST ast) {
-    final AccessModifierOption surroundingAccessModifier = CheckUtil
-        .getSurroundingAccessModifier(ast);
+    final AccessModifierOption surroundingAccessModifier =
+        getSurroundingAccessModifier(ast);
     final AccessModifierOption accessModifier = CheckUtil
         .getAccessModifierFromModifiersToken(ast);
     return surroundingAccessModifier != null
@@ -297,5 +296,4 @@ public class MissingJavaDocMethodUrpCheck extends AbstractCheck {
         .anyMatch(modifier -> modifier == surroundingAccessModifier)
         && Arrays.stream(accessModifiers).anyMatch(modifier -> modifier == accessModifier);
   }
-
 }
