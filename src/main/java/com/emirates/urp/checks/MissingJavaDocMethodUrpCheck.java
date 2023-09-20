@@ -5,6 +5,8 @@ import static com.emirates.urp.checks.common.DetailASTUtil.getRootClassName;
 import static java.util.stream.Collectors.toSet;
 
 import com.emirates.urp.util.CheckCodeStyleUtils;
+import com.emirates.urp.util.DiffParser;
+import com.emirates.urp.util.GitChange;
 import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
@@ -15,6 +17,7 @@ import com.puppycrawl.tools.checkstyle.checks.naming.AccessModifierOption;
 import com.puppycrawl.tools.checkstyle.utils.AnnotationUtil;
 import com.puppycrawl.tools.checkstyle.utils.CheckUtil;
 import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -24,6 +27,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.jgit.api.errors.GitAPIException;
 
 /**
  * "This class is derived from the MissingJavadocMethodCheck class in Checkstyle. Additionally, it
@@ -172,6 +176,15 @@ public class MissingJavaDocMethodUrpCheck extends AbstractCheck {
    */
   @Override
   public void init() {
+
+    try {
+      final List<GitChange> changes = DiffParser.parse(CheckCodeStyleUtils.getCurrentRepo(),
+          CheckCodeStyleUtils.findCurrentBranchName());
+
+    } catch (IOException | GitAPIException e) {
+      throw new RuntimeException("Happened something here");
+    }
+
     changedFileSet = Optional.ofNullable(fileExtensions)
         .filter(it -> enabledGit)
         .map(CheckCodeStyleUtils::getChangedFileList)
