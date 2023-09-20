@@ -48,11 +48,13 @@ public final class DiffParser {
       throws IOException, GitAPIException {
     final List<GitChange> returnValue = new LinkedList<>();
     final File gitDir = new File(repositoryPath, ".git");
+
     final Repository repository = new FileRepositoryBuilder().setGitDir(gitDir)
         .readEnvironment().findGitDir().build();
 
     try {
       final TreeParserPair pair = getTreeParserPair(repository, branchName);
+
       final Git git = new Git(repository);
       final DiffFormatter formatter = new DiffFormatter(DisabledOutputStream.INSTANCE);
       formatter.setRepository(repository);
@@ -94,8 +96,12 @@ public final class DiffParser {
     try {
       final RevCommit prCommit = walk.parseCommit(
           repository.exactRef(Constants.R_HEADS + branch).getObjectId());
+
+      System.out.println(prCommit.name());
+
+      //TODO: Может быть основная ветка как main так и master
       final RevCommit masterCommit = walk.parseCommit(
-          repository.exactRef(Constants.R_HEADS + "master").getObjectId());
+          repository.exactRef(Constants.R_HEADS + "main").getObjectId());
       final RevCommit commonAncestorCommit = getMergeBaseCommit(walk, prCommit, masterCommit);
       walk.dispose();
 

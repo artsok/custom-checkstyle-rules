@@ -178,8 +178,11 @@ public class MissingJavaDocMethodUrpCheck extends AbstractCheck {
   public void init() {
 
     try {
-      final List<GitChange> changes = DiffParser.parse(CheckCodeStyleUtils.getCurrentRepo(),
-          CheckCodeStyleUtils.findCurrentBranchName());
+      String currentBranchName = CheckCodeStyleUtils.findCurrentBranchName();
+      String currentRepo = CheckCodeStyleUtils.getCurrentRepo();
+      System.out.println(currentBranchName);
+      System.out.println(currentRepo);
+      final List<GitChange> changes = DiffParser.parse(currentRepo, currentBranchName);
 
     } catch (IOException | GitAPIException e) {
       throw new RuntimeException("Happened something here");
