@@ -27,6 +27,14 @@ public class Main {
     } catch (IOException | GitAPIException e) {
       throw new RuntimeException("222 something here");
     }
+
+    System.out.println("test commit");
+    System.out.println("test commit");
+    System.out.println("test commit");
+    System.out.println("test commit");
+    System.out.println("test commit");
+    System.out.println("test commit");
+    System.out.println("test commit");
   }
 
 
