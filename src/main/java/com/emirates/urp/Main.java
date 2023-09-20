@@ -17,13 +17,15 @@ public class Main {
       System.out.println(currentRepo);
       final List<GitChange> changes = DiffParser.parse(currentRepo, currentBranchName);
 
+      System.out.println("test commit");
+
       changes.forEach(it -> {
         System.out.println(it.path());
         System.out.println(it.addedLines());
       });
 
     } catch (IOException | GitAPIException e) {
-      throw new RuntimeException("Happened something here");
+      throw new RuntimeException("222 something here");
     }
   }
 
