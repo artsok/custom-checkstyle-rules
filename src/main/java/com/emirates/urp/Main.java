@@ -17,11 +17,14 @@ public class Main {
       System.out.println(currentRepo);
       final List<GitChange> changes = DiffParser.parse(currentRepo, currentBranchName);
 
+      System.out.println("isEmpty " + changes.isEmpty());
+
       System.out.println("test commit");
 
       changes.forEach(it -> {
         System.out.println(it.path());
         System.out.println(it.addedLines());
+        System.out.println(it.deletedLines());
       });
 
     } catch (IOException | GitAPIException e) {

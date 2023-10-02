@@ -177,6 +177,7 @@ public class MissingJavaDocMethodUrpCheck extends AbstractCheck {
   @Override
   public void init() {
 
+    //Здесь мне прийдет список строк которые были поменены и файлы, которые будут мы изменяли
     try {
       String currentBranchName = CheckCodeStyleUtils.findCurrentBranchName();
       String currentRepo = CheckCodeStyleUtils.getCurrentRepo();
@@ -205,6 +206,11 @@ public class MissingJavaDocMethodUrpCheck extends AbstractCheck {
     return getAcceptableTokens();
   }
 
+  /**
+   * К чему применяется правило
+   *
+   * @return
+   */
   @Override
   public int[] getAcceptableTokens() {
     return new int[]{
@@ -226,6 +232,20 @@ public class MissingJavaDocMethodUrpCheck extends AbstractCheck {
   @SuppressWarnings("deprecation")
   @Override
   public final void visitToken(DetailAST ast) {
+    //1. Получим открывающую скобку и закрывающуюся скобку для метода
+    //2. Далее получим их строки
+    //Get open curley bracket from first method
+
+//    DetailAST openingBrace = ast.findFirstToken(SLIST);
+//
+//    if (openingBrace != null) {
+//      DetailAST closingBrace = openingBrace.findFirstToken(RCURLY);
+
+    //3.Далее вычислим диапозон (и будем смотрет входит ли в этот диапозон те строки которые мы поменяли в ФАЙЛЕ)
+
+    //4. Если входит, то будем запускать наше правило, чтобы добавили документацию
+    //5. Если не входит то скипаем
+
     final Path path = Paths.get(getFilePath());
     final String filename = path.getFileName().getFileName().toString();
     final var rootClassName = getRootClassName(ast);

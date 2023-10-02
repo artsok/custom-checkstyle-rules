@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -163,19 +162,21 @@ public final class DiffParser {
   private static GitChange convertDiffEntryToGitChange(
       DiffEntry diffEntry, DiffFormatter formatter) throws IOException {
     final List<Integer> addedLines = formatter.toFileHeader(diffEntry).toEditList().stream()
-        .filter(edit -> edit.getBeginB() < edit.getEndB())
+        .filter(edit -> edit.getBeginB() <= edit.getEndB())
         .flatMapToInt(edit -> {
-          return IntStream.range(edit.getBeginB(), edit.getEndB() - 1);
+          return IntStream.range(edit.getBeginB(), edit.getEndB());
         })
         .boxed()
-        .collect(Collectors.toList());
+        .toList();
+
     final List<Integer> deletedLines = formatter.toFileHeader(diffEntry).toEditList().stream()
         .filter(edit -> edit.getBeginA() < edit.getEndA())
         .flatMapToInt(edit -> {
-          return IntStream.range(edit.getBeginA(), edit.getEndA() - 1);
+          return IntStream.range(edit.getBeginA(), edit.getEndA());
         })
         .boxed()
-        .collect(Collectors.toList());
+        .toList();
+
     return ImmutableGitChange.builder()
         .path(diffEntry.getNewPath())
         .addAllAddedLines(addedLines)
