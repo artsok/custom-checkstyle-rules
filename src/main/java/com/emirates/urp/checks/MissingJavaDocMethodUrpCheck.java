@@ -278,7 +278,7 @@ public class MissingJavaDocMethodUrpCheck extends AbstractCheck {
       final DetailAST openingBrace = Optional.ofNullable(ast)
           .map(it -> it.findFirstToken(TokenTypes.SLIST)).orElse(null);
       final DetailAST closingBrace = Optional.ofNullable(openingBrace)
-          .map(it -> findLastChildWhichHasType(it, TokenTypes.RCURLY)).orElse(null);
+          .map(this::findLastRCurly).orElse(null);
 
       if (Objects.isNull(openingBrace) || Objects.isNull(closingBrace)) {
         log.debug("opening brace or closing brace is null");
@@ -305,8 +305,7 @@ public class MissingJavaDocMethodUrpCheck extends AbstractCheck {
 
       //Проверяем входят ли в диапозон метода который сейчас проверяем любая из строк, где мы сделали изминения.
       if (addedLines.stream().anyMatch(methodLines::contains)
-          || deletedLines.stream().anyMatch(methodLines::contains) && (shouldCheck(
-          ast))) { //shouldCheck - проверяем модификаторы
+          || deletedLines.stream().anyMatch(methodLines::contains) && (checkModifierOption(ast))) {
         final FileContents contents = getFileContents();
         final TextBlock textBlock = contents.getJavadocBefore(ast.getLineNo());
         if (textBlock == null && !isMissingJavadocAllowed(ast)) {
@@ -317,12 +316,12 @@ public class MissingJavaDocMethodUrpCheck extends AbstractCheck {
   }
 
   /**
-   * Some javadoc.
+   * Get number of lines for method.
    *
-   * @param methodDef Some javadoc.
-   * @return Some javadoc.
+   * @param methodDef - {@link DetailAST}
+   * @return - number of lines.
    */
-  private static int getMethodsNumberOfLine(DetailAST methodDef) {
+  private int getMethodsNumberOfLine(DetailAST methodDef) {
     final int numberOfLines;
     final DetailAST lCurly = methodDef.getLastChild();
     final DetailAST rCurly = lCurly.getLastChild();
@@ -368,7 +367,7 @@ public class MissingJavaDocMethodUrpCheck extends AbstractCheck {
    * @param ast a given node.
    * @return whether we should check a given node.
    */
-  private boolean shouldCheck(final DetailAST ast) {
+  private boolean checkModifierOption(final DetailAST ast) {
     final AccessModifierOption surroundingAccessModifier = getSurroundingAccessModifier(ast);
     final AccessModifierOption accessModifier = CheckUtil.getAccessModifierFromModifiersToken(ast);
     return surroundingAccessModifier != null && Arrays.stream(accessModifiers)
@@ -376,16 +375,9 @@ public class MissingJavaDocMethodUrpCheck extends AbstractCheck {
         accessModifiers).anyMatch(modifier -> modifier == accessModifier);
   }
 
-  /**
-   * Найти закрывающую фигурную скобку для метода
-   *
-   * @param ast
-   * @param type
-   * @return
-   */
-  private DetailAST findLastChildWhichHasType(DetailAST ast, int type) {
+  private DetailAST findLastRCurly(DetailAST ast) {
     DetailAST child = ast.getLastChild();
-    while (child != null && child.getType() != type) {
+    while (child != null && child.getType() != TokenTypes.RCURLY) {
       child = child.getPreviousSibling();
     }
     return child;
