@@ -43,7 +43,7 @@ public final class DiffParser {
    * @throws IOException     JGit library exception
    * @throws GitAPIException JGit library exception
    */
-  public static List<GitChange> parse(String repositoryPath, String branchName)
+  public static List<GitChange> parse(String repositoryPath, String branchName, String mainBranch)
       throws IOException, GitAPIException {
     final List<GitChange> returnValue = new LinkedList<>();
     final File gitDir = new File(repositoryPath, ".git");
@@ -52,7 +52,7 @@ public final class DiffParser {
         .readEnvironment().findGitDir().build();
 
     try {
-      final TreeParserPair pair = getTreeParserPair(repository, branchName);
+      final TreeParserPair pair = getTreeParserPair(repository, branchName, mainBranch);
 
       final Git git = new Git(repository);
       final DiffFormatter formatter = new DiffFormatter(DisabledOutputStream.INSTANCE);
@@ -87,7 +87,8 @@ public final class DiffParser {
    * @return the TreeParserPair prepared for the further use
    * @throws IOException JGit library exception
    */
-  private static TreeParserPair getTreeParserPair(Repository repository, String branch)
+  private static TreeParserPair getTreeParserPair(Repository repository, String branch,
+      String mainBranch)
       throws IOException {
     final TreeParserPair returnValue;
     final RevWalk walk = new RevWalk(repository);
@@ -100,7 +101,7 @@ public final class DiffParser {
 
       //TODO: Может быть основная ветка как main так и master
       final RevCommit masterCommit = walk.parseCommit(
-          repository.exactRef(Constants.R_HEADS + "main").getObjectId());
+          repository.exactRef(Constants.R_HEADS + mainBranch).getObjectId());
       final RevCommit commonAncestorCommit = getMergeBaseCommit(walk, prCommit, masterCommit);
       walk.dispose();
 
