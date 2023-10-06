@@ -190,10 +190,15 @@ public class MissingJavaDocMethodUrpCheck extends AbstractCheck {
    */
   @Override
   public void init() {
-    //Здесь мне прийдет список строк которые были поменены и файлы, которые будут мы изменяли
     try {
       final String currentBranchName = CheckCodeStyleUtils.findCurrentBranchName();
       final String currentRepo = CheckCodeStyleUtils.getCurrentRepo();
+
+      if (currentRepo.equalsIgnoreCase(currentBranchName)) {
+        log.warn("You try to run check on the same branches");
+        return;
+      }
+
       log.debug("currentBranchName - '{}',  currentRepo - '{}, mainBranch - '{}'",
           currentBranchName, currentRepo, mainBranch);
       changes = DiffParser.parse(currentRepo, currentBranchName, mainBranch);
@@ -239,21 +244,6 @@ public class MissingJavaDocMethodUrpCheck extends AbstractCheck {
   @SuppressWarnings("deprecation")
   @Override
   public final void visitToken(DetailAST ast) {
-
-    //1. Получим открывающую скобку и закрывающуюся скобку для метода
-    //2. Далее получим их строки
-    //Get open curley bracket from first method
-
-//    DetailAST openingBrace = ast.findFirstToken(SLIST);
-//
-//    if (openingBrace != null) {
-//      DetailAST closingBrace = openingBrace.findFirstToken(RCURLY);
-
-    //3.Далее вычислим диапозон (и будем смотрет входит ли в этот диапозон те строки которые мы поменяли в ФАЙЛЕ)
-
-    //4. Если входит, то будем запускать наше правило, чтобы добавили документацию
-    //5. Если не входит то скипаем
-
     final Path path = Paths.get(getFilePath());
     final String filename = path.getFileName().getFileName().toString();
     final var rootClassName = getRootClassName(ast);
@@ -288,8 +278,6 @@ public class MissingJavaDocMethodUrpCheck extends AbstractCheck {
       final Set<Integer> methodLines = IntStream.range(openingBrace.getLineNo(),
           closingBrace.getLineNo() + 1).boxed().collect(Collectors.toSet());
 
-      //Нашли файл который сейчас обрабатываем и изминения к нему взяли от GIT (Изминения это строки у файла, которые правили)
-
       final Optional<GitChange> gitChange = changes.stream()
           .filter(it -> it.path().contains(filename)).findFirst();
 
@@ -303,7 +291,6 @@ public class MissingJavaDocMethodUrpCheck extends AbstractCheck {
       final List<Integer> deletedLines = gitChange.get().deletedLines().stream().map(it -> it + 1)
           .toList();
 
-      //Проверяем входят ли в диапозон метода который сейчас проверяем любая из строк, где мы сделали изминения.
       if (addedLines.stream().anyMatch(methodLines::contains)
           || deletedLines.stream().anyMatch(methodLines::contains) && (checkModifierOption(ast))) {
         final FileContents contents = getFileContents();

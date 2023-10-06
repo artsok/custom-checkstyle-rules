@@ -129,7 +129,6 @@ public final class CheckCodeStyleUtils {
     String currentRepo = executeCommandAndGetResultList(
         new ProcessBuilder("git", "rev-parse", "--show-toplevel")).get(0).trim();
     //new ProcessBuilder("git", "remote", "get-url", "origin")).get(0).trim();
-    System.out.println("sadasfsdafdsf " + currentRepo);
     return currentRepo + "/";
   }
 
