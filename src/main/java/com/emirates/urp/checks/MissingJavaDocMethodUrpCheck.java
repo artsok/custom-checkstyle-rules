@@ -190,10 +190,15 @@ public class MissingJavaDocMethodUrpCheck extends AbstractCheck {
    */
   @Override
   public void init() {
-    //Здесь мне прийдет список строк которые были поменены и файлы, которые будут мы изменяли
     try {
       final String currentBranchName = CheckCodeStyleUtils.findCurrentBranchName();
       final String currentRepo = CheckCodeStyleUtils.getCurrentRepo();
+
+      if (currentRepo.equalsIgnoreCase(currentBranchName)) {
+        log.warn("You try to run check on the same branches");
+        return;
+      }
+
       log.debug("currentBranchName - '{}',  currentRepo - '{}, mainBranch - '{}'",
           currentBranchName, currentRepo, mainBranch);
       changes = DiffParser.parse(currentRepo, currentBranchName, mainBranch);
