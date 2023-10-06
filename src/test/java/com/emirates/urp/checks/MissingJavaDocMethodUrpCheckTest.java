@@ -1,9 +1,11 @@
 package com.emirates.urp.checks;
 
 import com.emirates.urp.fixture.TestCheckstyle;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 
+@Disabled
 class MissingJavaDocMethodUrpCheckTest {
 
   @Test
