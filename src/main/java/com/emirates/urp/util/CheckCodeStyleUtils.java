@@ -125,7 +125,15 @@ public final class CheckCodeStyleUtils {
     }
   }
 
-  private static String findCurrentBranchName() {
+  public static String getCurrentRepo() {
+    String currentRepo = executeCommandAndGetResultList(
+        new ProcessBuilder("git", "rev-parse", "--show-toplevel")).get(0).trim();
+    //new ProcessBuilder("git", "remote", "get-url", "origin")).get(0).trim();
+    System.out.println("sadasfsdafdsf " + currentRepo);
+    return currentRepo + "/";
+  }
+
+  public static String findCurrentBranchName() {
     return executeCommandAndGetResultList(
         new ProcessBuilder("git", "rev-parse", "--abbrev-ref", "HEAD")).get(0).trim();
   }
